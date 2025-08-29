@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calculator-app
+  labels:
+    app: calculator
+spec:
+  replicas: 3   # 👉 3 pods (scale yahi se control hota hai)
+  selector:
+    matchLabels:
+      app: calculator
+  template:
+    metadata:
+      labels:
+        app: calculator
+    spec:
+      containers:
+        - name: calculator-app
+          image: harshit454/calculator-app:v1  # 👈 apna DockerHub username use karo
+          ports:
+            - containerPort: 8081   # 👈 App ka andar ka port (application.properties me set kiya hua)
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: calculator-service
+spec:
+  type: NodePort   # 👈 Cluster ke bahar se access karne ke liye
+  selector:
+    app: calculator
+  ports:
+    - protocol: TCP
+      port: 8081        # Service port (jo clients use karenge)
+      targetPort: 8081  # Pod ke andar ka port
+      nodePort: 30081   # 👈 NodePort (cluster ke bahar access ke liye, http://<node-ip>:30081)
